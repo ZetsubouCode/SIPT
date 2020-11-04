@@ -29,20 +29,30 @@ switch ($_GET['act']) {
     <td>Tanggal Masuk</td>
     <td>Selesai Kontrak</td>
     <td>Sisa Kontrak</td>
+    <td>Aksi</td>
   </tr>
   </thead>";
     $no = 1;
+    $button="";
     while ($dt = mysqli_fetch_array($tampil)) {
       $gaji_pokok =  number_format(($dt['gaji_pokok']), 0, ",", ".");
       if ($dt['sp'] == "Kontrak") {
         $temp = getSisaKontrak($dt['tgl_selesai']);
-        $sisa_kontrak= $temp[2];
+        $sisa_kontrak = $temp[2];
       } else {
         $sisa_kontrak = "-";
       }
       $umur = getUmur($dt['tgl_lahir']);
-      if(($dt['sp']=="Kontrak"&&(($temp[0]<2&&$temp[1]==0)||($temp[0]<2)))||($dt['sp']=="Tetap"&&$umur>=54)){
-      echo "<tr class='gradeX'>
+      if($dt['sp']=="Tetap" && $umur<=56){
+        $button="
+        <a href='./modul/riwayat/updateStatus.php?nip=$dt[nip]&status=kerja' class='btn btn_pencil'><span>Lanjut Kerja</span></a>
+        <a href='./modul/riwayat/updateStatus.php?nip=$dt[nip]&status=pensiun' class='btn btn_pencil'><span>Pensiun</span></a>";
+      }
+      else{
+        $button="";
+      }
+      if (($dt['sp'] == "Kontrak" && (($temp[0] < 2 && $temp[1] == 0) || ($temp[0] < 2))) || ($dt['sp'] == "Tetap" && $umur >= 54)) {
+        echo "<tr class='gradeX'>
     <td>$no</td>
     <td>$dt[nip]</td>
     <td>$dt[nama]</td>
@@ -52,10 +62,11 @@ switch ($_GET['act']) {
   <td>" . tgl_indo($dt['tgl_masuk']) . "</td>
   <td>" . $dt['tgl_selesai'] . "</td>
   <td>" . $sisa_kontrak . "</td>
+  <td>".$button."</td>
   </tr>";
-      
-      $no++;
-     }
+
+        $no++;
+      }
     }
     echo "  
 </table>
